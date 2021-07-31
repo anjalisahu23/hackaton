@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <logger name="org.springframework" level="INFO"/>
+    <property name="service.name" value="r4e-ticket-internal"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>[${service.name}]%-30([%d][%t])[%-5level]%-30([%class{0}.%method:%L])
+                %msg%n</Pattern>
+        </encoder>
+    </appender>
+    <logger name='com.reputation' level='INFO'/>
+
+    <root>
+        <level value="INFO" />
+        <appender-ref ref='STDOUT' />
+    </root>
+
+</configuration>

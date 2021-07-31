@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_19p75o8" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+  <bpmn:process id="SocialListingStep3" name="Obtain Query Result" isExecutable="true">
+    <bpmn:startEvent id="startEventStep3">
+      <bpmn:outgoing>Flow_15k1fx1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:subProcess id="Activity_1qb4s2j">
+      <bpmn:incoming>Flow_15k1fx1</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ot372u</bpmn:outgoing>
+      <bpmn:startEvent id="Event_1s9om49">
+        <bpmn:extensionElements>
+          <camunda:executionListener class="com.reputation.orchestration.delegate.LoggerDelegate" event="start" />
+        </bpmn:extensionElements>
+        <bpmn:outgoing>Flow_0ejkdwi</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_0ejkdwi" sourceRef="Event_1s9om49" targetRef="Gateway_0fi7q1f" />
+      <bpmn:eventBasedGateway id="Gateway_0fi7q1f">
+        <bpmn:incoming>Flow_0ejkdwi</bpmn:incoming>
+        <bpmn:incoming>Flow_0g0pm16</bpmn:incoming>
+        <bpmn:outgoing>Flow_0gthvgt</bpmn:outgoing>
+        <bpmn:outgoing>Flow_1tu5cmp</bpmn:outgoing>
+      </bpmn:eventBasedGateway>
+      <bpmn:intermediateCatchEvent id="Event_19q4lmz">
+        <bpmn:incoming>Flow_0gthvgt</bpmn:incoming>
+        <bpmn:outgoing>Flow_1q59tyx</bpmn:outgoing>
+        <bpmn:messageEventDefinition id="MessageEventDefinition_0y6v66n" messageRef="Message_1rjimqj" />
+      </bpmn:intermediateCatchEvent>
+      <bpmn:sequenceFlow id="Flow_0gthvgt" name="Good Result" sourceRef="Gateway_0fi7q1f" targetRef="Event_19q4lmz" />
+      <bpmn:sequenceFlow id="Flow_1q59tyx" sourceRef="Event_19q4lmz" targetRef="Activity_0h7aq7l" />
+      <bpmn:userTask id="Activity_0h7aq7l" name="Send query to TSE team to implement in Production">
+        <bpmn:incoming>Flow_1q59tyx</bpmn:incoming>
+        <bpmn:outgoing>Flow_0si8cm0</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:endEvent id="Event_1hm79gp">
+        <bpmn:extensionElements>
+          <camunda:executionListener class="com.reputation.orchestration.delegate.LoggerDelegate" event="start" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_0si8cm0</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_0si8cm0" sourceRef="Activity_0h7aq7l" targetRef="Event_1hm79gp" />
+      <bpmn:intermediateCatchEvent id="Event_1fyjy22">
+        <bpmn:incoming>Flow_1tu5cmp</bpmn:incoming>
+        <bpmn:outgoing>Flow_0uuyzmt</bpmn:outgoing>
+        <bpmn:messageEventDefinition id="MessageEventDefinition_09vae86" messageRef="Message_1f6rgny" />
+      </bpmn:intermediateCatchEvent>
+      <bpmn:sequenceFlow id="Flow_1tu5cmp" name="Query requires correction" sourceRef="Gateway_0fi7q1f" targetRef="Event_1fyjy22" />
+      <bpmn:sequenceFlow id="Flow_0uuyzmt" sourceRef="Event_1fyjy22" targetRef="Activity_1puqkmq" />
+      <bpmn:userTask id="Activity_1puqkmq" name="Setup call with Customer and Support TSE">
+        <bpmn:incoming>Flow_0uuyzmt</bpmn:incoming>
+        <bpmn:outgoing>Flow_1f9a52r</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_1f9a52r" sourceRef="Activity_1puqkmq" targetRef="Activity_12b83cd" />
+      <bpmn:sequenceFlow id="Flow_0g0pm16" sourceRef="Activity_12b83cd" targetRef="Gateway_0fi7q1f" />
+      <bpmn:callActivity id="Activity_12b83cd" name="Query Correction" calledElement="SocialListingStep2">
+        <bpmn:incoming>Flow_1f9a52r</bpmn:incoming>
+        <bpmn:outgoing>Flow_0g0pm16</bpmn:outgoing>
+      </bpmn:callActivity>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_15k1fx1" sourceRef="startEventStep3" targetRef="Activity_1qb4s2j" />
+    <bpmn:boundaryEvent id="Event_15jxg18" name="Timeline 2 days" attachedToRef="Activity_1qb4s2j">
+      <bpmn:outgoing>Flow_1r4vhyy</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0ddrrl4">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT2M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_1r4vhyy" sourceRef="Event_15jxg18" targetRef="Activity_1rrvek2" />
+    <bpmn:serviceTask id="Activity_1rrvek2" name="Escalate" camunda:delegateExpression="#{emailAdapter}">
+      <bpmn:incoming>Flow_1r4vhyy</bpmn:incoming>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_10p9gyy">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="#{slackAdapter}" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ot372u</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0ot372u" sourceRef="Activity_1qb4s2j" targetRef="Event_10p9gyy" />
+  </bpmn:process>
+  <bpmn:message id="Message_1rjimqj" name="goodResult" />
+  <bpmn:message id="Message_1f6rgny" name="requireCorrection" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="SocialListingStep3">
+      <bpmndi:BPMNEdge id="Flow_0ot372u_di" bpmnElement="Flow_0ot372u">
+        <di:waypoint x="950" y="310" />
+        <di:waypoint x="1002" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1r4vhyy_di" bpmnElement="Flow_1r4vhyy">
+        <di:waypoint x="580" y="558" />
+        <di:waypoint x="580" y="620" />
+        <di:waypoint x="650" y="620" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="579" y="586" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15k1fx1_di" bpmnElement="Flow_15k1fx1">
+        <di:waypoint x="215" y="200" />
+        <di:waypoint x="260" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startEventStep3">
+        <dc:Bounds x="179" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1qb4s2j_di" bpmnElement="Activity_1qb4s2j" isExpanded="true">
+        <dc:Bounds x="260" y="80" width="690" height="460" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0g0pm16_di" bpmnElement="Flow_0g0pm16">
+        <di:waypoint x="360" y="400" />
+        <di:waypoint x="360" y="220" />
+        <di:waypoint x="425" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1f9a52r_di" bpmnElement="Flow_1f9a52r">
+        <di:waypoint x="530" y="440" />
+        <di:waypoint x="410" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uuyzmt_di" bpmnElement="Flow_0uuyzmt">
+        <di:waypoint x="580" y="328" />
+        <di:waypoint x="580" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1tu5cmp_di" bpmnElement="Flow_1tu5cmp">
+        <di:waypoint x="430" y="225" />
+        <di:waypoint x="430" y="310" />
+        <di:waypoint x="562" y="310" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="433" y="265" width="73" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0si8cm0_di" bpmnElement="Flow_0si8cm0">
+        <di:waypoint x="770" y="200" />
+        <di:waypoint x="842" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1q59tyx_di" bpmnElement="Flow_1q59tyx">
+        <di:waypoint x="598" y="200" />
+        <di:waypoint x="670" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0gthvgt_di" bpmnElement="Flow_0gthvgt">
+        <di:waypoint x="455" y="200" />
+        <di:waypoint x="562" y="200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="182" width="62" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ejkdwi_di" bpmnElement="Flow_0ejkdwi">
+        <di:waypoint x="336" y="200" />
+        <di:waypoint x="405" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1s9om49_di" bpmnElement="Event_1s9om49">
+        <dc:Bounds x="300" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_16ht0q8_di" bpmnElement="Gateway_0fi7q1f">
+        <dc:Bounds x="405" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_19q4lmz_di" bpmnElement="Event_19q4lmz">
+        <dc:Bounds x="562" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1cvcblg_di" bpmnElement="Activity_0h7aq7l">
+        <dc:Bounds x="670" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1hm79gp_di" bpmnElement="Event_1hm79gp">
+        <dc:Bounds x="842" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1fyjy22_di" bpmnElement="Event_1fyjy22">
+        <dc:Bounds x="562" y="292" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00dc9gp_di" bpmnElement="Activity_1puqkmq">
+        <dc:Bounds x="530" y="400" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_095iwky_di" bpmnElement="Activity_12b83cd">
+        <dc:Bounds x="310" y="400" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00ly0pv_di" bpmnElement="Activity_1rrvek2">
+        <dc:Bounds x="650" y="580" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_10p9gyy_di" bpmnElement="Event_10p9gyy">
+        <dc:Bounds x="1002" y="292" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1mhsp3k_di" bpmnElement="Event_15jxg18">
+        <dc:Bounds x="562" y="522" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="541" y="503" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

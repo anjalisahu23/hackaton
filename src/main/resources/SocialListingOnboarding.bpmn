@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_174cmed" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+  <bpmn:process id="OnboardingSocialListing" name="Onboarding Social Listening" isExecutable="true">
+    <bpmn:subProcess id="Activity_1pcvnkj">
+      <bpmn:incoming>Flow_13m37f7</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kvm6r7</bpmn:outgoing>
+      <bpmn:startEvent id="processStart" name="Start Process">
+        <bpmn:extensionElements>
+          <camunda:executionListener class="com.reputation.orchestration.delegate.LoggerDelegate" event="start" />
+        </bpmn:extensionElements>
+        <bpmn:outgoing>Flow_1q1q39h</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_1q1q39h" sourceRef="processStart" targetRef="callCollectCustomerData" />
+      <bpmn:sequenceFlow id="Flow_02yab6o" sourceRef="callCollectCustomerData" targetRef="callBuildAndTestQuery" />
+      <bpmn:sequenceFlow id="Flow_19nlpud" sourceRef="callBuildAndTestQuery" targetRef="callAssignToTSE" />
+      <bpmn:sequenceFlow id="Flow_171pd9a" sourceRef="callAssignToTSE" targetRef="callHandsOffToProfessionalServices" />
+      <bpmn:endEvent id="processEnd" name="End Process">
+        <bpmn:extensionElements>
+          <camunda:executionListener class="com.reputation.orchestration.delegate.LoggerDelegate" event="start" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1yseh9c</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_1yseh9c" sourceRef="callHandsOffToProfessionalServices" targetRef="processEnd" />
+      <bpmn:callActivity id="callCollectCustomerData" name="Collect customer data" calledElement="SocialListingStep1">
+        <bpmn:extensionElements>
+          <camunda:executionListener class="com.reputation.orchestration.delegate.LoggerDelegate" event="start" />
+          <camunda:in businessKey="#{execution.processBusinessKey}" />
+          <camunda:in variables="all" />
+          <camunda:out variables="all" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1q1q39h</bpmn:incoming>
+        <bpmn:outgoing>Flow_02yab6o</bpmn:outgoing>
+      </bpmn:callActivity>
+      <bpmn:callActivity id="callBuildAndTestQuery" name="Build and verify Query" calledElement="SocialListingStep2">
+        <bpmn:extensionElements>
+          <camunda:executionListener class="com.reputation.orchestration.delegate.LoggerDelegate" event="start" />
+          <camunda:in businessKey="#{execution.processBusinessKey}" />
+          <camunda:in variables="all" />
+          <camunda:out variables="all" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_02yab6o</bpmn:incoming>
+        <bpmn:outgoing>Flow_19nlpud</bpmn:outgoing>
+      </bpmn:callActivity>
+      <bpmn:callActivity id="callAssignToTSE" name="Send query to TSE for Implmentation in Production" calledElement="SocialListingStep3">
+        <bpmn:extensionElements>
+          <camunda:executionListener class="com.reputation.orchestration.delegate.LoggerDelegate" event="start" />
+          <camunda:in businessKey="#{execution.processBusinessKey}" />
+          <camunda:in variables="all" />
+          <camunda:out variables="all" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_19nlpud</bpmn:incoming>
+        <bpmn:outgoing>Flow_171pd9a</bpmn:outgoing>
+      </bpmn:callActivity>
+      <bpmn:callActivity id="callHandsOffToProfessionalServices" name="TSE Updates to Professional Services" calledElement="SocialListingStep4">
+        <bpmn:extensionElements>
+          <camunda:executionListener class="com.reputation.orchestration.delegate.LoggerDelegate" event="start" />
+          <camunda:in businessKey="#{execution.processBusinessKey}" />
+          <camunda:in variables="all" />
+          <camunda:out variables="all" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_171pd9a</bpmn:incoming>
+        <bpmn:outgoing>Flow_1yseh9c</bpmn:outgoing>
+      </bpmn:callActivity>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_13m37f7" sourceRef="SLStartEvent" targetRef="Activity_1pcvnkj" />
+    <bpmn:sequenceFlow id="Flow_0kvm6r7" sourceRef="Activity_1pcvnkj" targetRef="SLEndEvent" />
+    <bpmn:boundaryEvent id="Event_0k70ebn" name="Timeline 7 Days" attachedToRef="Activity_1pcvnkj">
+      <bpmn:outgoing>Flow_0oyyfdd</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0nwxinq">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT7M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0oyyfdd" sourceRef="Event_0k70ebn" targetRef="Activity_07hhjk0" />
+    <bpmn:serviceTask id="Activity_07hhjk0" name="Escalate to stakeholders" camunda:delegateExpression="#{emailAdapter}">
+      <bpmn:incoming>Flow_0oyyfdd</bpmn:incoming>
+      <bpmn:outgoing>Flow_0rcrm9v</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_0s6ehuo">
+      <bpmn:incoming>Flow_0rcrm9v</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0rcrm9v" sourceRef="Activity_07hhjk0" targetRef="Event_0s6ehuo" />
+    <bpmn:startEvent id="SLStartEvent" name="Social Listening Onboarding Start">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="#{emailAdapter}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_13m37f7</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0prpt72" messageRef="Message_0mp5ytx" />
+    </bpmn:startEvent>
+    <bpmn:endEvent id="SLEndEvent" name="Social Listening Onboarding Completed">
+      <bpmn:incoming>Flow_0kvm6r7</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_1ezcklm" />
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:message id="Message_0mp5ytx" name="onboardCustomer" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="OnboardingSocialListing">
+      <bpmndi:BPMNEdge id="Flow_0rcrm9v_di" bpmnElement="Flow_0rcrm9v">
+        <di:waypoint x="700" y="410" />
+        <di:waypoint x="752" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0oyyfdd_di" bpmnElement="Flow_0oyyfdd">
+        <di:waypoint x="530" y="348" />
+        <di:waypoint x="530" y="410" />
+        <di:waypoint x="600" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kvm6r7_di" bpmnElement="Flow_0kvm6r7">
+        <di:waypoint x="1110" y="200" />
+        <di:waypoint x="1142" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13m37f7_di" bpmnElement="Flow_13m37f7">
+        <di:waypoint x="198" y="200" />
+        <di:waypoint x="260" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_1pcvnkj_di" bpmnElement="Activity_1pcvnkj" isExpanded="true">
+        <dc:Bounds x="260" y="80" width="850" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1yseh9c_di" bpmnElement="Flow_1yseh9c">
+        <di:waypoint x="980" y="200" />
+        <di:waypoint x="1052" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_171pd9a_di" bpmnElement="Flow_171pd9a">
+        <di:waypoint x="810" y="200" />
+        <di:waypoint x="880" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19nlpud_di" bpmnElement="Flow_19nlpud">
+        <di:waypoint x="650" y="200" />
+        <di:waypoint x="710" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02yab6o_di" bpmnElement="Flow_02yab6o">
+        <di:waypoint x="480" y="200" />
+        <di:waypoint x="550" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1q1q39h_di" bpmnElement="Flow_1q1q39h">
+        <di:waypoint x="328" y="200" />
+        <di:waypoint x="380" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_07vvwkb_di" bpmnElement="processStart">
+        <dc:Bounds x="292" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="277" y="225" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0vhpysu_di" bpmnElement="processEnd">
+        <dc:Bounds x="1052" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1039" y="225" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ied2qg_di" bpmnElement="callCollectCustomerData">
+        <dc:Bounds x="380" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1wi8q10_di" bpmnElement="callBuildAndTestQuery">
+        <dc:Bounds x="550" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0lnppe7_di" bpmnElement="callAssignToTSE">
+        <dc:Bounds x="710" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0e6dklk_di" bpmnElement="callHandsOffToProfessionalServices">
+        <dc:Bounds x="880" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_07xyktq_di" bpmnElement="Activity_07hhjk0">
+        <dc:Bounds x="600" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0s6ehuo_di" bpmnElement="Event_0s6ehuo">
+        <dc:Bounds x="752" y="392" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_06jgvpp_di" bpmnElement="SLStartEvent">
+        <dc:Bounds x="162" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="138" y="146" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_06aqy9w_di" bpmnElement="SLEndEvent">
+        <dc:Bounds x="1142" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1121" y="130" width="78" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0j79uod_di" bpmnElement="Event_0k70ebn">
+        <dc:Bounds x="512" y="312" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="490" y="283" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

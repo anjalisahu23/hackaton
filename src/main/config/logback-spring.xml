@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<configuration>
+    <property name="service.name" value="r4e-orchestration"/>
+
+    <include resource="logback-include.xml"/>
+
+    <logger name='com.reputation' level='INFO'/>
+    <logger name='com.reputation.dao' level='WARN'/>
+
+    <springProfile name="gcp|local">
+        <root>
+            <level value="WARN" />
+            <appender-ref ref='STDOUT' />
+            <appender-ref ref='FILE'/>
+        </root>
+    </springProfile>
+</configuration>
